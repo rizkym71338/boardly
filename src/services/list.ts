@@ -111,22 +111,25 @@ export const listCopy = async (data: { id: string; boardId: string }) => {
 
     const order = lastList ? lastList.order + 1 : 1
 
+    let cards: any = {}
+
+    if (listtoCopy?.cards?.length) {
+      cards = {
+        createMany: {
+          data: listtoCopy?.cards?.map((card: any) => ({
+            title: card?.title,
+            description: card.description,
+            order: card.order,
+          })),
+        },
+      }
+    }
     list = await prismaDB.list.create({
       data: {
         boardId: listtoCopy.boardId,
         title: `${listtoCopy?.title} - copy`,
         order,
-        cards: listtoCopy?.cards?.length
-          ? {
-              createMany: {
-                data: listtoCopy?.cards?.map((card: any) => ({
-                  title: card?.title,
-                  description: card.description,
-                  order: card.order,
-                })),
-              },
-            }
-          : {},
+        cards,
       },
       include: {
         cards: true,
